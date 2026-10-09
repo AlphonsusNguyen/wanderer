@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Writing Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a narrow masthead column on the left (name, filters, about) beside a ruled index of pieces;
+   opening a piece swaps the index for a single reading column with a margin note for date and length. */
+:root {
+  --bg: #eef1f0;
+  --surface: #f8faf9;
+  --fg: #17211e;
+  --muted: #56655f;
+  --rule: #cdd6d2;
+  --accent: #1d5c7a;
+  --accent-fg: #ffffff;
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Literata", Georgia, "Times New Roman", serif;
+  --font-util: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111817;
+    --surface: #182120;
+    --fg: #e4ebe8;
+    --muted: #94a59f;
+    --rule: #2b3836;
+    --accent: #7fc0de;
+    --accent-fg: #0d1514;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111817;
+  --surface: #182120;
+  --fg: #e4ebe8;
+  --muted: #94a59f;
+  --rule: #2b3836;
+  --accent: #7fc0de;
+  --accent-fg: #0d1514;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  padding-inline: 1rem;
+  padding-block: 2rem 4rem;
+}
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.shell {
+  max-width: 62rem;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  gap: 3rem;
+}
+@media (max-width: 760px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+}
+
+/* Masthead */
+.mast { display: flex; flex-direction: column; gap: 1.5rem; align-self: start; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 2rem); min-width: 0; }
+@media (max-width: 760px) { .mast { position: static; } }
+.site-name {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  line-height: 1.1;
+  text-wrap: balance;
+  margin: 0;
+}
+.site-name button { all: unset; cursor: pointer; }
+.site-name button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.tagline { margin: 0; color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
+.filters { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.filters button {
+  font-family: var(--font-util);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px solid var(--rule);
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+.filters button:hover { border-color: var(--accent); color: var(--fg); }
+.filters button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.about { border-top: 1px solid var(--rule); padding-top: 1.25rem; font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+.about h2 { font-family: var(--font-util); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 0.5rem; color: var(--fg); font-weight: 500; }
+.about p { margin: 0; }
+
+/* Index */
+.index-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; border-bottom: 2px solid var(--fg); padding-bottom: 0.6rem; margin-bottom: 0.25rem; }
+.index-head h2 { font-family: var(--font-util); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; font-weight: 500; }
+.count { font-family: var(--font-util); font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { border-bottom: 1px solid var(--rule); }
+.entry {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  padding-block: 1.4rem;
+  cursor: pointer;
+}
+.entry:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+@media (max-width: 520px) { .entry { grid-template-columns: minmax(0, 1fr); gap: 0.3rem; } }
+.meta { font-family: var(--font-util); font-size: 0.75rem; color: var(--muted); letter-spacing: 0.03em; line-height: 1.9; font-variant-numeric: tabular-nums; }
+.meta .kind { display: block; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+@media (max-width: 520px) { .meta .kind { display: inline; margin-right: 0.75rem; } }
+.entry h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.45rem; line-height: 1.25; margin: 0 0 0.4rem; text-wrap: balance; }
+.entry:hover h3 { color: var(--accent); }
+.entry p { margin: 0; color: var(--muted); font-size: 0.97rem; line-height: 1.6; }
+.empty { padding-block: 2rem; color: var(--muted); }
+
+/* Reading view */
+.piece { display: grid; grid-template-columns: 7rem minmax(0, 38rem); gap: 2rem; }
+@media (max-width: 900px) { .piece { grid-template-columns: minmax(0, 1fr); gap: 1rem; } }
+.back { all: unset; cursor: pointer; font-family: var(--font-util); font-size: 0.8rem; letter-spacing: 0.04em; color: var(--muted); grid-column: 1 / -1; }
+.back:hover { color: var(--accent); }
+.back:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.margin-note { font-family: var(--font-util); font-size: 0.75rem; color: var(--muted); line-height: 1.9; font-variant-numeric: tabular-nums; padding-top: 0.6rem; }
+.margin-note .kind { display: block; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+.text { min-width: 0; }
+.text h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.9rem, 5vw, 2.7rem); line-height: 1.15; margin: 0 0 1.75rem; text-wrap: balance; }
+.text p { margin: 0 0 1.2rem; }
+.text.verse p { white-space: pre-line; line-height: 1.75; }
+.text .lede { font-style: italic; color: var(--muted); }
+.pager { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; border-top: 1px solid var(--rule); margin-top: 2.5rem; padding-top: 1.25rem; }
+.pager button { all: unset; cursor: pointer; max-width: 100%; font-size: 0.95rem; line-height: 1.4; }
+.pager button:hover .t { color: var(--accent); }
+.pager button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.pager .dir { display: block; font-family: var(--font-util); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.pager .next { text-align: right; margin-left: auto; }
+
+footer { max-width: 62rem; margin: 4rem auto 0; padding-top: 1rem; border-top: 1px solid var(--rule); font-family: var(--font-util); font-size: 0.75rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .view { animation: rise 0.25s ease-out; }
+  @keyframes rise { from { opacity: 0.4; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+}
+</style>
+
+</head>
+<body>
+<div class="shell">
+  <aside class="mast">
+    <h1 class="site-name"><button type="button" id="home">Anphonsus Nguyen</button></h1>
+    <p class="tagline">Essays and poems, kept in one place.</p>
+    <div class="filters" id="filters" role="group" aria-label="Filter by kind"></div>
+    <div class="about">
+      <h2>About</h2>
+      <p>I write to hold on to moments before they slip away, in poems and short essays about time, memory and paying attention. I’m Anphonsus Nguyen, and this is my notebook.</p>
+    </div>
+  </aside>
+  <main id="main" class="view" aria-live="polite"></main>
+</div>
+<footer>Last updated 9 Oct 2026</footer>
+
+<script>
+// To add a piece, copy one entry, give it a new id (letters, digits and hyphens) and paste your text into body.
+// Separate paragraphs with a blank line. For poems, set kind to "Poem" and keep line breaks inside each stanza.
+var PIECES = [
+  {
+    id: "hour-of-indigo", kind: "Poem", date: "2026-10-09",
+    title: "The Hour of Indigo",
+    excerpt: "A poem about dusk, a firefly, and the pause between breath and word.",
+    body: "The sun dips low, a coin of burning brass,\nSlipping beneath the pockets of the world.\nShadows stretch their fingers through the grass,\nAs evening’s indigo is soft unfurled.\n\nThe chatter of the daylight fades to ash,\nThe trees stand silent, solemn, deep in thought.\nA sudden firefly, a fleeting flash,\nA tiny spark in velvet woven, caught.\n\nThis is the pause between the breath and word,\nWhen time forgets the rushing of the stream.\nThe only sound, the rustle of a bird,\nDrifting into the quiet of a dream."
+  },
+  {
+    id: "architecture-of-a-moment", kind: "Essay", date: "2026-10-08",
+    title: "The Architecture of a Moment: Why We Capture the Fleeting",
+    excerpt: "Why we photograph, write down and hold on to moments, and what we risk missing while we do.",
+    body: "We live in an era of obsessive documentation. With high-definition cameras resting comfortably in our pockets, humanity has collectively decided that every sunset, every plated meal, and every quiet afternoon is a moment meant to be captured. But beyond the superficial desire for digital validation lies a deeper, more profound human instinct: the attempt to anchor ourselves against the relentless flow of time.\n\nWhen we pause to photograph a mundane street corner or write down a passing thought in a journal, we are engaging in an act of quiet rebellion. Time is an undefeated force, dissolving the present into the past before we can fully comprehend it. A captured moment—whether through a lens, a brush, or a pen—serves as a tangible anchor. It is a declaration that this specific alignment of light and shadow, this exact feeling of melancholy or joy, actually existed.\n\nYet, the paradox of capturing moments is that in our rush to preserve them, we often forget to inhabit them. The eye looking through the viewfinder is sometimes detached from the heart experiencing the scene. The true art lies in finding the balance: allowing ourselves to be entirely swallowed by the beauty of the present, while occasionally picking up a stone from the riverbank to remember the texture of the water. We capture the fleeting not just to remember what the world looked like, but to remind ourselves of who we were when we looked at it."
+  }
+];
+
+var main = document.getElementById("main");
+var filtersEl = document.getElementById("filters");
+var kinds = ["All"].concat(["Essay", "Poem", "Note"].filter(function (k) {
+  return PIECES.some(function (p) { return p.kind === k; });
+}));
+var currentKind = "All";
+
+function fmtDate(iso) {
+  var p = iso.split("-");
+  var m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+p[1] - 1];
+  return +p[2] + " " + m + " " + p[0];
+}
+function readMinutes(text) {
+  var words = text.trim().split(/\s+/).length;
+  return Math.max(1, Math.round(words / 220));
+}
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+function sorted() {
+  return PIECES.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+}
+
+function renderFilters() {
+  filtersEl.textContent = "";
+  kinds.forEach(function (k) {
+    var b = el("button", null, k === "All" ? "All" : k + "s");
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(k === currentKind));
+    b.addEventListener("click", function () {
+      currentKind = k;
+      showIndex(true);
+    });
+    filtersEl.appendChild(b);
+  });
+}
+
+function showIndex(updateHash) {
+  var items = sorted().filter(function (p) { return currentKind === "All" || p.kind === currentKind; });
+  renderFilters();
+  main.textContent = "";
+  var head = el("div", "index-head");
+  head.appendChild(el("h2", null, currentKind === "All" ? "All writing" : currentKind + "s"));
+  head.appendChild(el("span", "count", items.length + (items.length === 1 ? " piece" : " pieces")));
+  main.appendChild(head);
+  var ul = el("ul", "list");
+  if (!items.length) ul.appendChild(el("li", "empty", "Nothing here yet."));
+  items.forEach(function (p) {
+    var li = document.createElement("li");
+    var b = el("button", "entry");
+    b.type = "button";
+    var meta = el("div", "meta");
+    meta.appendChild(el("span", "kind", p.kind));
+    meta.appendChild(el("span", null, fmtDate(p.date)));
+    var body = el("div");
+    body.appendChild(el("h3", null, p.title));
+    body.appendChild(el("p", null, p.excerpt));
+    b.appendChild(meta);
+    b.appendChild(body);
+    b.addEventListener("click", function () { showPiece(p.id, true); });
+    li.appendChild(b);
+    ul.appendChild(li);
+  });
+  main.appendChild(ul);
+  if (updateHash) setHash("");
+  window.scrollTo(0, 0);
+}
+
+function showPiece(id, updateHash) {
+  var all = sorted();
+  var idx = all.findIndex(function (p) { return p.id === id; });
+  if (idx < 0) { showIndex(false); return; }
+  var p = all[idx];
+  main.textContent = "";
+  var wrap = el("article", "piece");
+  var back = el("button", "back", "← All writing");
+  back.type = "button";
+  back.addEventListener("click", function () { showIndex(true); });
+  wrap.appendChild(back);
+
+  var note = el("div", "margin-note");
+  note.appendChild(el("span", "kind", p.kind));
+  note.appendChild(el("span", null, fmtDate(p.date)));
+  note.appendChild(el("span", null, readMinutes(p.body) + " min read"));
+  wrap.appendChild(note);
+
+  var text = el("div", "text" + (p.kind === "Poem" ? " verse" : ""));
+  text.appendChild(el("h1", null, p.title));
+  p.body.split(/\n\n/).forEach(function (para) { text.appendChild(el("p", null, para)); });
+
+  var pager = el("div", "pager");
+  function pagerBtn(target, label, cls) {
+    var b = el("button", cls);
+    b.type = "button";
+    b.appendChild(el("span", "dir", label));
+    b.appendChild(el("span", "t", target.title));
+    b.addEventListener("click", function () { showPiece(target.id, true); });
+    return b;
+  }
+  if (all[idx + 1]) pager.appendChild(pagerBtn(all[idx + 1], "Older", "prev"));
+  if (all[idx - 1]) pager.appendChild(pagerBtn(all[idx - 1], "Newer", "next"));
+  text.appendChild(pager);
+  wrap.appendChild(text);
+  main.appendChild(wrap);
+
+  currentKind = "All";
+  renderFilters();
+  document.title = p.title + " — Writing Desk";
+  if (updateHash) setHash(p.id);
+  window.scrollTo(0, 0);
+}
+
+function setHash(h) {
+  try { history.replaceState(null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
+  if (!h) document.title = "Writing Desk";
+}
+function route() {
+  var h = (location.hash || "").replace("#", "");
+  if (h) showPiece(h, false); else showIndex(false);
+}
+
+document.getElementById("home").addEventListener("click", function () { currentKind = "All"; showIndex(true); });
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
